@@ -1,0 +1,8 @@
+PORT 
+DB_CLOUD_CONNECTION_URL
+TOKEN_PREFIX = "Prefix string for logIn token"
+LOGIN_SIGN = "login token's Signature"
+SIGNUP_CONFIRMATION_EMAIL_TOKEN
+SALT_ROUNDS = "For hashing the password"
+CONFIGURED_EMAIL = "emial responsibles for sending mails notify"
+CONFIGURED_EMAIL_APP_PASSWORD = "passcode of configured email app instance"
