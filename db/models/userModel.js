@@ -25,7 +25,6 @@ const userSchema = new Schema({
     profilePicture: {
         secure_url: String,
         public_id: String,
-        default: {}
     },
 
     role: {
@@ -37,7 +36,6 @@ const userSchema = new Schema({
     coverPicture: {
         secure_url: String,
         public_id: String,
-        default: {}
     },
     followers: {
         type: Array,
@@ -65,7 +63,7 @@ const userSchema = new Schema({
     },
     from: {
         type: String,
-        max: 50,
+        max: 20,
     },
     relationship: {
         type: String,

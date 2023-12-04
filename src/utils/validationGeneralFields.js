@@ -20,5 +20,19 @@ export const generalFields = {
     password: joi.string().min(6).regex(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{5,}$/)
         .messages({ 'string.pattern.base': 'Password regex fail', }),
 
-    role: joi.string().valid(systemRoles.USER, systemRoles.ADMIN)
+    role: joi.string().valid(systemRoles.USER, systemRoles.ADMIN),
+
+    files: joi.array().items(
+        joi.object({
+            size: joi.number().positive().required(),
+            path: joi.string().required(),
+            filename: joi.string().required(),
+            destination: joi.string().required(),
+            mimetype: joi.string().required(),
+            encoding: joi.string().required(),
+            originalname: joi.string().required(),
+            fieldname: joi.string().required()
+        })
+    )
+
 }
