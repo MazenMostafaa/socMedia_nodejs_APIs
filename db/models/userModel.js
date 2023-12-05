@@ -38,11 +38,11 @@ const userSchema = new Schema({
         public_id: String,
     },
     followers: {
-        type: Array,
+        type: [{ type: Schema.Types.ObjectId, ref: 'User' }],
         default: []
     },
     following: {
-        type: Array,
+        type: [{ type: Schema.Types.ObjectId, ref: 'user' }],
         default: []
     },
     token: {
