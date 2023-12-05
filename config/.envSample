@@ -7,8 +7,4 @@ SIGNUP_CONFIRMATION_EMAIL_TOKEN
 SALT_ROUNDS = "For hashing the password"
 CONFIGURED_EMAIL = "emial responsibles for sending mails notify"
 CONFIGURED_EMAIL_APP_PASSWORD = "passcode of configured email app instance"
-CLOUDINARY_CONFIG = {
-    API_SECRET,
-    API_KEY
-}
 USERS_FOLDER_ROOT = "path of a media asset on cloudinary"
