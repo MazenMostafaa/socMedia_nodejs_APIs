@@ -1,4 +1,5 @@
 import joi from 'joi'
+import { Types } from 'mongoose'
 import { systemRoles } from './systemRoles.js'
 
 // ======= custome validation for object-Id ========
@@ -9,7 +10,7 @@ const validationObjectId = (value, helper) => {
 // ======= fields are used more than once ========
 export const generalFields = {
 
-    userid: joi.string().custom(validationObjectId),
+    userId: joi.string().custom(validationObjectId),
 
     username: joi.string().min(3).max(20).regex(/^[a-zA-Z_-\s]*$/).trim()
         .messages({ 'any.required': 'userName is required', }),

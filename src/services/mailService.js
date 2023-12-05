@@ -15,7 +15,7 @@ export async function sendEmailService({
             pass: process.env.CONFIGURED_EMAIL_APP_PASSWORD,
         },
         tls: {
-            rejectUnauthorized: true
+            rejectUnauthorized: false
         }
     })
 

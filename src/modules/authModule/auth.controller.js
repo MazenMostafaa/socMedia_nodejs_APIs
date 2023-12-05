@@ -110,7 +110,7 @@ export const login = async (req, res, next) => {
     })
 
     const logedInUser = await userModel.findOneAndUpdate(
-        { $or: [{ email, username }] },
+        { $or: [{ email }, { username }] },
         { token },
         { new: true }
     )

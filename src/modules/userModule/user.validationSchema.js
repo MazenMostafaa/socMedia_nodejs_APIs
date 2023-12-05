@@ -8,17 +8,9 @@ export const updateSchema = {
 
             password: generalFields.password.optional(),
 
-            Cpassword: generalFields.password.when('password', {
-                is: true,
-                then: joi.valid(joi.ref('password')).required(),
-                otherwise: joi.optional()
-            }),
+            Cpassword: generalFields.password.valid(joi.ref('password')).optional(),
 
-            oldpassword: generalFields.password.when('password', {
-                is: true,
-                then: joi.required(),
-                otherwise: joi.optional()
-            }),
+            oldpassword: generalFields.password.optional(),
 
             desc: joi.string().max(50).optional(),
             city: joi.string().min(3).max(25).optional(),
@@ -28,4 +20,28 @@ export const updateSchema = {
 
         })
         .required()
+}
+
+export const getUserSchema = {
+    query: joi.object({
+        userId: generalFields.userId.required()
+    }).required()
+}
+
+export const deleteUserSchema = {
+    query: joi.object({
+        userId: generalFields.userId.required()
+    }).required()
+}
+
+export const followSchema = {
+    query: joi.object({
+        followedId: generalFields.userId.required()
+    }).required()
+}
+
+export const unfollowSchema = {
+    query: joi.object({
+        unfollowedId: generalFields.userId.required()
+    }).required()
 }

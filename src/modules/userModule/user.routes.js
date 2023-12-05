@@ -19,4 +19,24 @@ router.put('/update',
     asyncHandler(uc.update))
 
 
+router.get('/get',
+    isAuth(userApisRole.GET_A_USER),
+    validationFunction(validator.getUserSchema),
+    asyncHandler(uc.getUser))
+
+router.delete('/delete',
+    isAuth(userApisRole.DELETE_A_USER),
+    validationFunction(validator.deleteUserSchema),
+    asyncHandler(uc.deleteUser))
+
+router.patch('/follow',
+    isAuth(userApisRole.FOLLOW),
+    validationFunction(validator.followSchema),
+    asyncHandler(uc.follow))
+
+
+router.patch('/unfollow',
+    isAuth(userApisRole.UNFOLLOW),
+    validationFunction(validator.unfollowSchema),
+    asyncHandler(uc.unfollow))
 export default router
