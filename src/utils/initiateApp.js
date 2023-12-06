@@ -19,6 +19,7 @@ export const initiateApp = (app, express) => {
 
     app.use('/api/auth', allRouters.authRouters)
     app.use('/api/users', allRouters.userRouters)
+    app.use('/api/post', allRouters.postRouter)
 
     app.use(globalResponse)
 
