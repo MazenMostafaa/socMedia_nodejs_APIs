@@ -157,7 +157,7 @@ export const follow = async (req, res, next) => {
         return next(new Error("can't followed yourself", { cause: 400 }))
     }
 
-    const currentUser = await userModel.findById(_id)
+    const currentUser = await userModel.findById(_id).select('_id followers following')
     const followedUser = await userModel.findById(followedId)
     if (!followedUser) {
         return next(new Error("couldn't find followed user", { cause: 400 }))
@@ -172,7 +172,7 @@ export const follow = async (req, res, next) => {
 
     res.status(200).json({
         message: "following is done",
-        user: currentUser.followers
+        user: currentUser
     })
 }
 
@@ -184,7 +184,7 @@ export const unfollow = async (req, res, next) => {
         return next(new Error("can't unfollow yourself", { cause: 400 }))
     }
 
-    const currentUser = await userModel.findById(_id)
+    const currentUser = await userModel.findById(_id).select('_id followers following')
     const unfollowedUser = await userModel.findById(unfollowedId)
     if (!unfollowedUser) {
         return next(new Error("couldn't find unfollowed user", { cause: 400 }))
@@ -199,6 +199,6 @@ export const unfollow = async (req, res, next) => {
 
     res.status(200).json({
         message: "unfollowing is done",
-        userFollowers: currentUser.followers
+        userFollowers: currentUser
     })
 }
