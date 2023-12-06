@@ -157,7 +157,7 @@ export const follow = async (req, res, next) => {
         return next(new Error("can't followed yourself", { cause: 400 }))
     }
 
-    const currentUser = await userModel.findById(_id).select('_id followers following')
+    const currentUser = await userModel.findById(_id)
     const followedUser = await userModel.findById(followedId)
     if (!followedUser) {
         return next(new Error("couldn't find followed user", { cause: 400 }))
@@ -167,12 +167,14 @@ export const follow = async (req, res, next) => {
         return next(new Error("you've Already followed this user", { cause: 400 }))
     }
 
-    await userModel.findByIdAndUpdate(currentUser._id, { $push: { following: followedId } }, { new: true })
+    const currentuser = await userModel
+        .findByIdAndUpdate(currentUser._id, { $push: { following: followedId } }, { new: true })
+        .select('_id followers following')
     await userModel.findByIdAndUpdate(followedUser._id, { $push: { followers: _id } }, { new: true })
 
     res.status(200).json({
         message: "following is done",
-        user: currentUser
+        userFollowers_ing: currentuser
     })
 }
 
@@ -194,11 +196,13 @@ export const unfollow = async (req, res, next) => {
         return next(new Error("you didn't follow this user", { cause: 400 }))
     }
 
-    await userModel.findByIdAndUpdate(currentUser._id, { $pull: { following: unfollowedId } }, { new: true })
+    const currentuser = await userModel
+        .findByIdAndUpdate(currentUser._id, { $pull: { following: unfollowedId } }, { new: true })
+        .select('_id followers following')
     await userModel.findByIdAndUpdate(unfollowedUser._id, { $pull: { followers: _id } }, { new: true })
 
     res.status(200).json({
         message: "unfollowing is done",
-        userFollowers: currentUser
+        userFollowers_ing: currentuser
     })
 }
