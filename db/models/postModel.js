@@ -1,27 +1,29 @@
 import mongoose, { Schema } from "mongoose";
 
-const postSchema = new mongoose.Schema(
-    {
-        userId: {
-            type: Schema.Types.ObjectId,
-            ref: 'user',
-            required: true,
-        },
-        desc: {
-            type: String,
-            max: 500,
-            required: true
-        },
-        img: {
-            secure_url: String,
-            public_id: String
-        },
-        likes: {
-            type: [{ type: Schema.Types.ObjectId, ref: 'user' }],
-            default: []
-        },
+const postSchema = new Schema({
+    userId: {
+        type: Schema.Types.ObjectId,
+        ref: 'user',
+        required: true,
     },
-    { timestamps: true }
-);
+    desc: {
+        type: String,
+        max: 500,
+        trim: true,
+        required: true
+    },
+    medias: [{
+        secure_url: String,
+        public_id: String,
+    }],
+    likes: {
+        type: [{ type: Schema.Types.ObjectId, ref: 'user' }],
+        default: []
+    },
+},
+    {
+        timestamps: true
 
-module.exports = mongoose.model("post", postSchema);
+    })
+
+export const postModel = mongoose.model('post', postSchema)
