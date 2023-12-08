@@ -13,8 +13,8 @@ const postSchema = new Schema({
         required: true
     },
     medias: [{
-        secure_url: String,
-        public_id: String,
+        secure_url: { type: String },
+        public_id: { type: String },
     }],
     likes: {
         type: [{ type: Schema.Types.ObjectId, ref: 'user' }],
