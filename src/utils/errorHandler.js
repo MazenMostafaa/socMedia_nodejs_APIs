@@ -5,12 +5,8 @@ export const asyncHandler = (API) => {
 
         // call function 
         API(req, res, next)
-            .catch(async (err) => {
+            .catch((err) => {
                 console.log(err)
-                if (req.failedDocument) {
-                    const { model, _id } = failedDocument
-                    await model.findByIdAndDelete(_id)
-                }
                 res.status(500).json({ message: "Failed" })
             })
 
