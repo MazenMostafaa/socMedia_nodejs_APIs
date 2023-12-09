@@ -69,7 +69,8 @@ const userSchema = new Schema({
         type: String,
         enum: ["single", "engaged", "divorced", "not specified"],
         default: "not specified"
-    }
+    },
+    forgetCode: String,
 
 }, {
     timestamps: true
