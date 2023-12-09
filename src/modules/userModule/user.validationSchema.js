@@ -45,3 +45,19 @@ export const unfollowSchema = {
         unfollowedId: generalFields.userId.required()
     }).required()
 }
+
+export const forgetPasswordSchema = {
+    body: joi
+        .object({
+            email: generalFields.email.required(),
+        }).required()
+}
+
+export const resetPasswordSchema = {
+    body: joi
+        .object({
+            password: generalFields.password.required(),
+            Cpassword: generalFields.password.valid(joi.ref('password')).required(),
+
+        }).required()
+}

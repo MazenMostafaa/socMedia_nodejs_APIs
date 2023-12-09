@@ -2,6 +2,9 @@ import { userModel } from "../../../db/models/userModel.js"
 import pkg from 'bcrypt'
 import cloudinary from '../../utils/mediaCloudConfig.js'
 import { systemRoles } from "../../utils/systemRoles.js"
+import { nanoid } from "nanoid"
+import { generateToken, verifyToken } from '../../utils/tokenFunctions.js'
+import { sendEmailService } from '../../services/mailService.js'
 
 export const update = async (req, res, next) => {
 
@@ -205,4 +208,84 @@ export const unfollow = async (req, res, next) => {
         message: "unfollowing is done",
         userFollowers_ing: currentuser
     })
+}
+
+export const forgetPassword = async (req, res, next) => {
+    const { email } = req.body
+    const user = await userModel.findOne({ email })
+    if (!user) {
+        return next(new Error('invalid email', { cause: 400 }))
+    }
+
+    const code = nanoid()
+    const hashedCode = pkg.hashSync(code, +process.env.SALT_ROUNDS)
+
+    const token = generateToken({
+        payload: {
+            email,
+            sentCode: hashedCode,
+        },
+        signature: process.env.FORGET_PASS_TOKEN,
+        expiresIn: '1h',
+    })
+
+    const resetPasswordLink = `${req.protocol}://${req.headers.host}/api/users/reset/${token}`
+
+    const isEmailSent = sendEmailService({
+        to: email,
+        subject: 'Reset Password',
+        message: `<a href=${resetPasswordLink}>Click here to confirm </a>`,
+    })
+    if (!isEmailSent) {
+        return next(new Error('fail to sent reset password email', { cause: 400 }))
+    }
+
+    const userUpdates = await userModel.findOneAndUpdate(
+        { email },
+        {
+            forgetCode: hashedCode,
+        },
+        {
+            new: true,
+        },
+    )
+    if (!userUpdates) {
+        return next(
+            new Error('changing password process is failed ,try to fetch an API again', { cause: 400 }))
+    }
+    res.status(200).json({ message: 'confirmation email for resetting password has been sent' })
+}
+
+export const resetPassword = async (req, res, next) => {
+    const { token } = req.params
+
+    const decoded = verifyToken({ token, signature: process.env.FORGET_PASS_TOKEN })
+
+    const user = await userModel.findOne({
+        email: decoded?.email,
+        forgetCode: decoded?.sentCode,
+    })
+
+    if (!user) {
+        return next(
+            new Error('your already reset your password once before , try to login', { cause: 400 })
+        )
+    }
+
+    const { password, Cpassword } = req.body
+    if (!password || !Cpassword) {
+        return next(
+            new Error('must supply with password and confirm password', { cause: 400 }))
+    }
+    const hashedPassword = pkg.hashSync(password, +process.env.SALT_ROUNDS)
+
+    user.password = hashedPassword
+    user.forgetCode = null
+
+    const resetedPassData = await user.save()
+    if (!resetedPassData) {
+        return next(
+            new Error('changing password process is failed,try to fetch an API again', { cause: 400 }))
+    }
+    res.status(200).json({ message: 'password has been updated successfully' })
 }

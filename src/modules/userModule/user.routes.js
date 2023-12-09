@@ -9,8 +9,6 @@ import { validationFunction } from '../../middlewares/validation.js'
 import * as validator from './user.validationSchema.js'
 const router = Router()
 
-
-
 router.put('/update',
     multerCloudFunction(allowedExtensions.Image)
         .fields([{ name: 'profilePicture', maxCount: 1 }, { name: 'coverPicture', maxCount: 1 }]),
@@ -39,4 +37,14 @@ router.patch('/unfollow',
     isAuth(userApisRole.UNFOLLOW),
     validationFunction(validator.unfollowSchema),
     asyncHandler(uc.unfollow))
+
+router.post('/forget',
+    isAuth(userApisRole.RESET_PASSWORD),
+    validationFunction(validator.forgetPasswordSchema),
+    asyncHandler(uc.forgetPassword))
+
+router.post('/reset/:token',
+    validationFunction(validator.resetPasswordSchema),
+    asyncHandler(uc.resetPassword))
+
 export default router

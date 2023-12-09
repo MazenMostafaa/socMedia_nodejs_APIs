@@ -5,5 +5,6 @@ export const userApisRole = {
     GET_A_USER: [systemRoles.USER, systemRoles.ADMIN],
     DELETE_A_USER: [systemRoles.USER, systemRoles.ADMIN],
     FOLLOW: [systemRoles.USER],
-    UNFOLLOW: [systemRoles.USER]
+    UNFOLLOW: [systemRoles.USER],
+    RESET_PASSWORD: [systemRoles.USER, systemRoles.ADMIN]
 }
