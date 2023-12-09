@@ -10,7 +10,6 @@ const postSchema = new Schema({
         type: String,
         max: 500,
         trim: true,
-        required: true
     },
     medias: [{
         secure_url: { type: String },
