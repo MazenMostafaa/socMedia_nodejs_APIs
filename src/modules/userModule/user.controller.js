@@ -63,22 +63,22 @@ export const update = async (req, res, next) => {
 
             for (const key of req.files[file]) {
                 if (key.fieldname == "profilePicture") {
-                    await cloudinary.uploader.destroy(userCheck.profilePicture.public_id)
                     const { secure_url, public_id } = await cloudinary.uploader.upload(key.path,
                         {
                             folder: `${process.env.USERS_FOLDER_ROOT}/profiles/${userCheck._id}`
                         }
                     )
+                    await cloudinary.uploader.destroy(userCheck.profilePicture.public_id)
                     profilePicture = { secure_url, public_id }
                     profileFlag = true
                 }
                 if (key.fieldname == "coverPicture") {
-                    await cloudinary.uploader.destroy(userCheck.coverPicture.public_id)
                     const { secure_url, public_id } = await cloudinary.uploader.upload(key.path,
                         {
                             folder: `${process.env.USERS_FOLDER_ROOT}/covers/${userCheck._id}`
                         }
                     )
+                    await cloudinary.uploader.destroy(userCheck.coverPicture.public_id)
                     coverPicture = { secure_url, public_id }
                     coverFlag = true
                 }
