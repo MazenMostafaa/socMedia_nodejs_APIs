@@ -9,6 +9,13 @@ import { validationFunction } from '../../middlewares/validation.js'
 import * as validator from './user.validationSchema.js'
 const router = Router()
 
+
+router.post('/logout',
+    isAuth(userApisRole.LOGOUT),
+    validationFunction(validator.logoutSchema),
+    asyncHandler(uc.logout)
+)
+
 router.put('/update',
     multerCloudFunction(allowedExtensions.Image)
         .fields([{ name: 'profilePicture', maxCount: 1 }, { name: 'coverPicture', maxCount: 1 }]),

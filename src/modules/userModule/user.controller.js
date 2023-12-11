@@ -6,6 +6,26 @@ import { nanoid } from "nanoid"
 import { generateToken, verifyToken } from '../../utils/tokenFunctions.js'
 import { sendEmailService } from '../../services/mailService.js'
 
+
+export const logout = async (req, res, next) => {
+    const { _id } = req.authUser
+    const { userId } = req.query
+
+    if (_id.toString() !== userId.toString()) {
+        return next(new Error("there is a conflict between token's id and sent id", { cause: 400 }))
+    }
+
+    const user = await userModel.findById(userId)
+    if (!user) {
+        return next(new Error("user not found may be got delete from DB", { cause: 400 }))
+    }
+
+    const updatedUser = await userModel.findByIdAndUpdate(userId, { token: null }, { new: true })
+    const { username, email, role } = updatedUser
+
+    res.status(200).json({ message: "Logged out", username, email, role })
+}
+
 export const update = async (req, res, next) => {
 
     const { _id } = req.authUser
@@ -15,6 +35,9 @@ export const update = async (req, res, next) => {
 
     if (!isUserExist) {
         return next(new Error("invalid user Id", { cause: 400 }))
+    }
+    if (!isUserExist.token) {
+        return next(new Error("this user is logged out ,log in to continue process", { cause: 400 }))
     }
     const userCheck = await userModel.hydrate(isUserExist)
 
@@ -111,6 +134,9 @@ export const getUser = async (req, res, next) => {
     if (!getuser) {
         return next(new Error("invalid user Id", { cause: 400 }))
     }
+    if (!getuser.token) {
+        return next(new Error("this user is logged out ,log in to continue process", { cause: 400 }))
+    }
 
     const { password, updatedAt, ...other } = getuser._doc
 
@@ -119,11 +145,15 @@ export const getUser = async (req, res, next) => {
 }
 
 export const deleteUser = async (req, res, next) => {
-    const { _id, role } = req.authUser
+    const { _id, role, token } = req.authUser
     const { userId } = req.query
 
     if (role == systemRoles.USER && userId.toString() !== _id.toString()) {
         return next(new Error("un-authorized to delete this account", { cause: 400 }))
+    }
+
+    if (!token) {
+        return next(new Error("this user is logged out ,log in to continue process", { cause: 400 }))
     }
 
     const deleteduser = await userModel.findByIdAndDelete(userId)
@@ -161,6 +191,9 @@ export const follow = async (req, res, next) => {
     }
 
     const currentUser = await userModel.findById(_id)
+    if (!currentUser.token) {
+        return next(new Error("this user is logged out ,log in to continue process", { cause: 400 }))
+    }
     const followedUser = await userModel.findById(followedId)
     if (!followedUser) {
         return next(new Error("couldn't find followed user", { cause: 400 }))
@@ -190,6 +223,9 @@ export const unfollow = async (req, res, next) => {
     }
 
     const currentUser = await userModel.findById(_id).select('_id followers following')
+    if (!currentUser.token) {
+        return next(new Error("this user is logged out ,log in to continue process", { cause: 400 }))
+    }
     const unfollowedUser = await userModel.findById(unfollowedId)
     if (!unfollowedUser) {
         return next(new Error("couldn't find unfollowed user", { cause: 400 }))

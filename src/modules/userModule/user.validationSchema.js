@@ -1,6 +1,14 @@
 import joi from 'joi'
 import { generalFields } from '../../utils/validationGeneralFields.js'
 
+export const logoutSchema = {
+    query: joi
+        .object({
+            userId: generalFields.userId.required(),
+        })
+        .required()
+}
+
 export const updateSchema = {
     body: joi
         .object({
