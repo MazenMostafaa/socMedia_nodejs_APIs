@@ -5,13 +5,16 @@ import cloudinary from '../../utils/mediaCloudConfig.js'
 
 export const create = async (req, res, next) => {
 
-    const { _id } = req.authUser
+    const { _id, token } = req.authUser
     const { userId } = req.query
     const { desc } = req.body
 
 
     if (_id.toString() !== userId.toString()) {
         return next(new Error("there is a conflict between token's id and sent id", { cause: 400 }))
+    }
+    if (!token) {
+        return next(new Error("this user is logged out ,log in to continue process", { cause: 400 }))
     }
 
     let description
@@ -44,12 +47,15 @@ export const create = async (req, res, next) => {
 }
 
 export const update = async (req, res, next) => {
-    const { _id } = req.authUser
+    const { _id, token } = req.authUser
     const { userId, postId } = req.query
     const { desc } = req.body
 
     if (_id.toString() !== userId.toString()) {
         return next(new Error("there is a conflict between token's id and sent id", { cause: 400 }))
+    }
+    if (!token) {
+        return next(new Error("this user is logged out ,log in to continue process", { cause: 400 }))
     }
 
     const isPostExist = await postModel.findById(postId)
@@ -96,13 +102,16 @@ export const update = async (req, res, next) => {
 }
 
 export const deletePost = async (req, res, next) => {
-    const { _id } = req.authUser
+    const { _id, token } = req.authUser
     const { userId, postId } = req.query
 
     if (_id.toString() !== userId.toString()) {
         return next(new Error("there is a conflict between token's id and sent id", { cause: 400 }))
     }
 
+    if (!token) {
+        return next(new Error("this user is logged out ,log in to continue process", { cause: 400 }))
+    }
     const isPostExist = await postModel.findById(postId)
     if (!isPostExist) {
         return next(new Error("It seems like that post might be deleted", { cause: 400 }))
@@ -125,8 +134,12 @@ export const deletePost = async (req, res, next) => {
 
 export const like_Dislike = async (req, res, next) => {
 
+    const { token } = req.authUser
     const { likedId, postId } = req.query
 
+    if (!token) {
+        return next(new Error("this user is logged out ,log in to continue process", { cause: 400 }))
+    }
     const post = await postModel.findById(postId)
     if (!post) {
         return next(new Error("It seems like that post might be deleted", { cause: 400 }))
@@ -147,12 +160,15 @@ export const like_Dislike = async (req, res, next) => {
 }
 
 export const timeLine = async (req, res, next) => {
-    const { _id } = req.authUser
+    const { _id, token } = req.authUser
     const { userId } = req.query
 
 
     if (_id.toString() !== userId.toString()) {
         return next(new Error("there is a conflict between token's id and sent id", { cause: 400 }))
+    }
+    if (!token) {
+        return next(new Error("this user is logged out ,log in to continue process", { cause: 400 }))
     }
 
     const currentUser = await userModel.findById(userId)
