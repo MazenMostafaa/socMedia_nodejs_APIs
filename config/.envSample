@@ -10,3 +10,4 @@ CONFIGURED_EMAIL_APP_PASSWORD = "passcode of configured email app instance"
 USERS_FOLDER_ROOT = "path of a media asset on cloudinary"
 POSTS_FOLDER_ROOT = "path of a media asset on cloudinary"
 FORGET_PASS_TOKEN
+CLIENT_ID
