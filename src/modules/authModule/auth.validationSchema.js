@@ -25,3 +25,10 @@ export const loginSchema = {
         .required()
 }
 
+export const loginWithGoogleSchema = {
+    body: joi
+        .object({
+            idToken: joi.string().required()
+        })
+        .required()
+}

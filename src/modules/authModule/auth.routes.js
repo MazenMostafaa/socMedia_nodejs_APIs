@@ -10,5 +10,8 @@ router.post('/register', validationFunction(validator.registerSchema), asyncHand
 router.get('/confirmEmail/:token', asyncHandler(ac.confirmEmail))
 
 router.post('/login', validationFunction(validator.loginSchema), asyncHandler(ac.login))
+router.post('/googleAuth',
+    validationFunction(validator.loginWithGoogleSchema),
+    asyncHandler(ac.loginWithGmail))
 
 export default router

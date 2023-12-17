@@ -2,6 +2,9 @@ import { userModel } from '../../../db/models/userModel.js'
 import { generateToken, verifyToken } from '../../utils/tokenFunctions.js'
 import { sendEmailService } from '../../services/mailService.js'
 import pkg from 'bcrypt'
+import { OAuth2Client } from 'google-auth-library'
+import { providers, systemRoles } from '../../utils/systemRoles.js'
+import { nanoid } from 'nanoid'
 
 export const register = async (req, res, next) => {
 
@@ -46,7 +49,8 @@ export const register = async (req, res, next) => {
         username,
         email,
         password: hashedPassword,
-        role
+        role,
+        provider: providers.SYSTEM
     })
 
     // save Query
@@ -56,7 +60,8 @@ export const register = async (req, res, next) => {
         _id: user._id
     }
 
-    res.status(201).json({ message: "user added", savedUser })
+
+    res.status(201).json({ message: "user is created", userName: savedUser.username, Email: savedUser.email })
 }
 
 export const confirmEmail = async (req, res, next) => {
@@ -75,7 +80,7 @@ export const confirmEmail = async (req, res, next) => {
     if (!user) {
         return next(new Error('this email is already confirmed', { cause: 400 }))
     }
-    res.status(200).json({ messge: 'Confirmed done, please try to login', user })
+    res.status(200).json({ messge: 'Confirmed done, please try to login' })
 }
 
 export const login = async (req, res, next) => {
@@ -115,6 +120,77 @@ export const login = async (req, res, next) => {
         { new: true }
     )
 
-    res.status(200).json({ Message: "User loged in", userToke: logedInUser.token })
+
+    res.status(200).json({
+        Message: "User loged in",
+        userRole: logedInUser.role,
+        userToken: logedInUser.token
+    })
+}
+
+export const loginWithGmail = async (req, res, next) => {
+    const client = new OAuth2Client()
+    const { idToken } = req.body
+    async function verify() {
+        const ticket = await client.verifyIdToken({
+            idToken,
+            audience: process.env.CLIENT_ID,
+        })
+        const payload = ticket.getPayload()
+        return payload
+    }
+    const { email_verified, email, name } = await verify()
+    if (!email_verified) {
+        return next(new Error('invalid email', { cause: 400 }))
+    }
+    const user = await userModel.findOne({ email, provider: providers.GOOGLE })
+    //login
+    if (user) {
+        const token = generateToken({
+            payload: {
+                email,
+                _id: user._id,
+                role: user.role,
+            },
+            signature: process.env.LOGIN_SIGN,
+            expiresIn: '5d',
+        })
+
+        const userUpdated = await userModel.findOneAndUpdate(
+            { email },
+            {
+                token,
+            },
+            {
+                new: true,
+            },
+        )
+        const { username, role } = userUpdated
+        return res.status(200).json({ messge: 'Login done', username, role, token })
+    }
+
+    // signUp
+    const userObject = {
+        username: name,
+        email,
+        password: pkg.hashSync(nanoid(6), +process.env.SALT_ROUNDS),
+        provider: providers.GOOGLE,
+        isConfirmed: true,
+        role: systemRoles.USER,
+    }
+    const newUser = await userModel.create(userObject)
+    const token = generateToken({
+        payload: {
+            email: newUser.email,
+            _id: newUser._id,
+            role: newUser.role,
+        },
+        signature: process.env.LOGIN_SIGN,
+        expiresIn: '5d',
+    })
+    newUser.token = token
+    await newUser.save()
+    const { username, role } = newUser
+    res.status(200).json({ message: 'Verified', username, role, Token: newUser.token })
 }
 
