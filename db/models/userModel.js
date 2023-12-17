@@ -1,5 +1,5 @@
 import mongoose, { Schema } from "mongoose";
-import { systemRoles } from '../../src/utils/systemRoles.js'
+import { systemRoles, providers } from '../../src/utils/systemRoles.js'
 
 const userSchema = new Schema({
     username: {
@@ -32,6 +32,12 @@ const userSchema = new Schema({
         enum: [systemRoles.USER, systemRoles.ADMIN],
         required: true,
         default: systemRoles.USER
+    },
+    provider: {
+        type: String,
+        enum: [providers.SYSTEM, providers.GOOGLE, providers.FACEBOOK],
+        required: true,
+        default: providers.SYSTEM
     },
     coverPicture: {
         secure_url: String,
