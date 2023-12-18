@@ -94,7 +94,10 @@ export const update = async (req, res, next) => {
                             folder: `${process.env.USERS_FOLDER_ROOT}/profiles/${userCheck._id}`
                         }
                     )
-                    await cloudinary.uploader.destroy(userCheck.profilePicture.public_id)
+                    if (userCheck.profilePicture.key) {
+
+                        await cloudinary.uploader.destroy(userCheck.profilePicture.public_id)
+                    }
                     profilePicture = { secure_url, public_id }
                     profileFlag = true
                 }
@@ -104,7 +107,10 @@ export const update = async (req, res, next) => {
                             folder: `${process.env.USERS_FOLDER_ROOT}/covers/${userCheck._id}`
                         }
                     )
-                    await cloudinary.uploader.destroy(userCheck.coverPicture.public_id)
+                    if (userCheck.coverPicture.key) {
+
+                        await cloudinary.uploader.destroy(userCheck.coverPicture.public_id)
+                    }
                     coverPicture = { secure_url, public_id }
                     coverFlag = true
                 }
@@ -124,6 +130,7 @@ export const update = async (req, res, next) => {
     if (!updatedUser) {
         return next(new Error("Fail to update", { cause: 400 }))
     }
+
     res.status(200).json({ message: 'user has been Updated successfully', updatedUser })
 }
 
@@ -152,7 +159,9 @@ export const deleteUser = async (req, res, next) => {
         return next(new Error("un-authorized to delete this account", { cause: 400 }))
     }
 
-    if (!token) {
+    const user = await userModel.findById(_id).select('token')
+
+    if (!user.token) {
         return next(new Error("this user is logged out ,log in to continue process", { cause: 400 }))
     }
 
@@ -210,7 +219,7 @@ export const follow = async (req, res, next) => {
 
     res.status(200).json({
         message: "following is done",
-        userFollowers_ing: currentuser
+        userFollows: currentuser
     })
 }
 
@@ -222,7 +231,7 @@ export const unfollow = async (req, res, next) => {
         return next(new Error("can't unfollow yourself", { cause: 400 }))
     }
 
-    const currentUser = await userModel.findById(_id).select('_id followers following')
+    const currentUser = await userModel.findById(_id)
     if (!currentUser.token) {
         return next(new Error("this user is logged out ,log in to continue process", { cause: 400 }))
     }
@@ -242,7 +251,7 @@ export const unfollow = async (req, res, next) => {
 
     res.status(200).json({
         message: "unfollowing is done",
-        userFollowers_ing: currentuser
+        userFollows: currentuser
     })
 }
 

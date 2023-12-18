@@ -5,7 +5,7 @@ import cloudinary from '../../utils/mediaCloudConfig.js'
 
 export const create = async (req, res, next) => {
 
-    const { _id, token } = req.authUser
+    const { _id } = req.authUser
     const { userId } = req.query
     const { desc } = req.body
 
@@ -13,7 +13,8 @@ export const create = async (req, res, next) => {
     if (_id.toString() !== userId.toString()) {
         return next(new Error("there is a conflict between token's id and sent id", { cause: 400 }))
     }
-    if (!token) {
+    const user = await userModel.findById(_id).select('token')
+    if (!user.token) {
         return next(new Error("this user is logged out ,log in to continue process", { cause: 400 }))
     }
 
@@ -47,14 +48,15 @@ export const create = async (req, res, next) => {
 }
 
 export const update = async (req, res, next) => {
-    const { _id, token } = req.authUser
+    const { _id } = req.authUser
     const { userId, postId } = req.query
     const { desc } = req.body
 
     if (_id.toString() !== userId.toString()) {
         return next(new Error("there is a conflict between token's id and sent id", { cause: 400 }))
     }
-    if (!token) {
+    const user = await userModel.findById(_id).select('token')
+    if (!user.token) {
         return next(new Error("this user is logged out ,log in to continue process", { cause: 400 }))
     }
 
@@ -102,14 +104,14 @@ export const update = async (req, res, next) => {
 }
 
 export const deletePost = async (req, res, next) => {
-    const { _id, token } = req.authUser
+    const { _id } = req.authUser
     const { userId, postId } = req.query
 
     if (_id.toString() !== userId.toString()) {
         return next(new Error("there is a conflict between token's id and sent id", { cause: 400 }))
     }
-
-    if (!token) {
+    const user = await userModel.findById(_id).select('token')
+    if (!user.token) {
         return next(new Error("this user is logged out ,log in to continue process", { cause: 400 }))
     }
     const isPostExist = await postModel.findById(postId)
