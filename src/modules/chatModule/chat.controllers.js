@@ -1,5 +1,6 @@
 import { userModel } from "../../../db/models/userModel.js"
 import { chatModel } from "../../../db/models/chatModel.js"
+import { getIO } from "../../utils/socketIo.js"
 
 export const sendMessage = async (req, res, next) => {
 
@@ -24,7 +25,7 @@ export const sendMessage = async (req, res, next) => {
             path: 'pTwo'
         }
     ])
-    // if there is not chat
+
     if (!chat) {
         const newChat = await chatModel.create({
             pOne: _id,
@@ -35,17 +36,23 @@ export const sendMessage = async (req, res, next) => {
                 to: destId
             }
         })
-        // Socket emit receiveMessage here
+
+        // Socket emit receiveMessage (event) here
+        getIO().to(destUser.socketId).emit('receiveMessage', message)
+
         return res.status(201).json({ message: "Done", newChat })
     }
-    // In case there is a chat already exist
+
     chat.messages.push({
         message,
         from: _id,
         to: destId
     })
     await chat.save()
+
     // Socket emit receiveMessage here
+    getIO().to(destUser.socketId).emit('receiveMessage', message)
+
     res.status(201).json({ message: "Done", chat })
 }
 
@@ -66,6 +73,6 @@ export const getChat = async (req, res, next) => {
             path: 'pTwo'
         }
     ])
-    // Socket emit receiveMessage here
+
     res.status(200).json({ message: "Done", chat })
 }
