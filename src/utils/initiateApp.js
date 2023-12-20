@@ -2,6 +2,10 @@ import { globalResponse } from './errorHandler.js'
 import { dbConnection } from "../../db/connection.js"
 import * as allRouters from '../modules/index.routes.js'
 import helmet from "helmet"
+import { initiateIO } from './socketIo.js'
+import { socketAuth } from '../middlewares/auth.js'
+import { systemRoles } from './systemRoles.js'
+import { userModel } from '../../db/models/userModel.js'
 
 export const initiateApp = (app, express) => {
 
@@ -31,5 +35,21 @@ export const initiateApp = (app, express) => {
 
 
 
-    app.listen(port, () => { console.log(`...Server is running on Port ${port}`); })
+    const httpServer = app.listen(port, () => { console.log(`...Server is running on Port ${port}`); })
+
+    const io = initiateIO(httpServer)
+
+    io.on('connection', (socket) => {
+        console.log({ socketId: socket.id })
+
+        socket.on('updateSocketId', async (data) => {
+            console.log(data);
+            const { _id } = await socketAuth(data.token, [systemRoles.USER, systemRoles.ADMIN], socket.id)
+
+            if (_id) {
+                await userModel.updateOne({ _id }, { socketId: socket.id })
+                socket.emit('updateSocketId', "Done")
+            }
+        })
+    })
 }
