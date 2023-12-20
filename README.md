@@ -5,10 +5,12 @@ A social media application that provides engagement and interact among people by
 
 ## Features
 
-- Providing a notification sender using mail.
-- google social login.
-- secure transfer data among stages by adding a strong validation layer.
-- well_organized file structure with (MVC)arch and easy to scalable and maintaine. 
+- Providing a real time notification sender using mail.
+- Google social login.
+- Applying chat room with real time communication.
+- Achieving live time-line for posts and status. 
+- Secure transfer data among stages by adding a strong validation layer and auth middleware.
+- Well_organized file structure with (MVC)arch and easy to scalable and maintaine.  
 
 ## Technologies Used
 
@@ -16,6 +18,7 @@ A social media application that provides engagement and interact among people by
 - Express.js
 - MongoDB 
 - Cloudinary media host
+- Socket.io
 
 ### Prerequisites
 
