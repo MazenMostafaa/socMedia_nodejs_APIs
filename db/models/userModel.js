@@ -77,6 +77,7 @@ const userSchema = new Schema({
         default: "not specified"
     },
     forgetCode: String,
+    socketId: String
 
 }, {
     timestamps: true
