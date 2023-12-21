@@ -20,6 +20,13 @@ A social media application that provides engagement and interact among people by
 - Cloudinary media host
 -Socket.io
 
+### End points :-
+
+- Auth module (register , login , google login)
+- User module (update, get, delete, follow, unfollow, forget passowrd, reset pass, logout)
+- Post module (create, update, delete, like-dislike, time-line)
+- Chat module (send message, get chat)
+
 ### Prerequisites
 
 - Node.js (version)
