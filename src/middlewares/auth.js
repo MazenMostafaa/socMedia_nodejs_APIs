@@ -24,7 +24,7 @@ export const isAuth = (roles) => {
 
             const findUser = await userModel.findById(
                 decodedData._id,
-                'email username role')
+                'email username role token')
             if (!findUser) {
                 return res.status(400).json({ message: 'Please SignUp' })
             }
